@@ -1,0 +1,25 @@
+{
+  "name": "adventofcode2021",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.ts",
+  "scripts": {
+    "build": "bash build.sh"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Hagej/adventOfCode2021.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Hagej/adventOfCode2021/issues"
+  },
+  "homepage": "https://github.com/Hagej/adventOfCode2021#readme",
+  "dependencies": {
+    "typescript": "^4.5.2"
+  },
+  "devDependencies": {
+    "@types/node": "^16.11.11"
+  }
+}
