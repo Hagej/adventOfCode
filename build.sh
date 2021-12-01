@@ -20,7 +20,7 @@ while getopts 'y:d:l:' arg; do
 done
 
 run_with_input() {
-    FILE="${1:-input.txt}"
+    FILE="${1:-input}"
     NAME="${2:-INPUT}"
     if [ -f "$FILE" ]; then
         echo -e "RUNNING USING $NAME DATA\n"
@@ -45,7 +45,7 @@ if [ "$LANG" == 'ts' ]; then
     tsc index.ts 
 fi
 
-run_with_input "debug.txt" "DEBUG"
+run_with_input "debug" "DEBUG"
 
 run_with_input 
 
