@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.ts",
   "scripts": {
-    "build": "bash build.sh"
+    "build": "bash build.sh",
+    "python": "bash build-py.sh"
   },
   "repository": {
     "type": "git",
