@@ -1,41 +1,37 @@
-# adventOfCode2021
+# Advent of Code
 
-This repo contains my solutions for the 2021 coding challenge <a href="https://adventofcode.com">Advent of code</a> where one coding challenge is posted every morning until Christmas day.
+This repo contains my solutions for the coding challenge <a href="https://adventofcode.com">Advent of code</a> where one coding challenge is posted every morning until Christmas day. There is a separate folder for each year.
 
-## Coding language
+[2020](./2020/README.md) - Typescript
 
-This year I've decided to do the challenge in Typescript on NodeJS as this is the language I'm currently most comfortable with and as I want to see how fast I can complete the challenges!
+[2021](./2021/README.md) - Typescript (timed), Python
 
-However as a learning experience I'm also planning on doing as many of the challenges in Python as well, without any pressure to complete it fast!
+## Instructions
 
-## Times
+### Install
 
-Below is a list of the times i got on each challenge
+Make sure you have <a href="https://docs.npmjs.com/downloading-and-installing-node-js-and-npm">node and npm</a> installed and then run
 
-| Day | Part 1 | Part 2 |
-| --- | ------ | ------ |
-| 1   | 3m13s  | 6m19s  |
-| 2   | 4m43s  | 6m15s  |
-| 3   | 14m26s | 33m5s  |
-| 4   |        |        |
-| 5   |        |        |
-| 6   |        |        |
-| 7   |        |        |
-| 8   |        |        |
-| 9   |        |        |
-| 10  |        |        |
-| 11  |        |        |
-| 12  |        |        |
-| 13  |        |        |
-| 14  |        |        |
-| 15  |        |        |
-| 16  |        |        |
-| 17  |        |        |
-| 18  |        |        |
-| 19  |        |        |
-| 20  |        |        |
-| 21  |        |        |
-| 22  |        |        |
-| 23  |        |        |
-| 24  |        |        |
-| 25  |        |        |
+```
+npm i
+```
+
+### Input
+
+To get the input run:
+
+```
+bash fetch_input.sh -y YEAR -d DAY
+```
+
+All flags are optional. If nothing is entered, the current year and day will be used.
+
+This script only works if there is a `.env` file in the repo root with an `AOC_SESSION_COOKIE=[your-aoc-session-cookie]` in it.
+
+### Running
+
+To run the code for any year and day run:
+
+```
+npm run build
+```
