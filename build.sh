@@ -5,7 +5,7 @@ NC='\033[0m'
 
 LANG='ts'
 read -r YEAR DAY <<< "$(date +'%Y %-d')"
-while getopts 'y:d:l:' arg; do
+while getopts 'y:d:l:f:' arg; do
     case $arg in
         y)
             YEAR=${OPTARG}
@@ -16,18 +16,20 @@ while getopts 'y:d:l:' arg; do
         l)
             LANG=${OPTARG}
             ;;
+        f)
+            FILE=${OPTARG}
     esac
 done
 
 run_with_input() {
-    FILE="${1:-input}"
+    INPUT="${1:-input}"
     NAME="${2:-INPUT}"
-    if [ -f "$FILE" ]; then
+    if [ -f "$INPUT" ]; then
         echo -e "RUNNING USING $NAME DATA\n"
         if [ "${LANG}" == "ts" ]; then
-            result=$(node index.js $FILE)
+            result=$(node $FILE.js $INPUT)
         elif [ "${LANG}" == "py" ]; then
-            result=$(python3 main.py $FILE)
+            result=$(python3 $FILE.py $INPUT)
         else 
             echo "Language ${LANG} not supported!"    
             exit 1
@@ -41,8 +43,16 @@ run_with_input() {
 echo -e "Building and running in: $BASE_PATH/$YEAR/$DAY\n"
 cd "$BASE_PATH/$YEAR/$DAY"
 
+if [ -z ${FILE+x} ]; then
+    if [ -f "partTwo.$LANG" ]; then
+        FILE="partTwo"
+    elif [ -f "partOne.$LANG" ]; then
+        FILE="partOne"
+    fi
+fi
+
 if [ "$LANG" == 'ts' ]; then 
-    tsc index.ts 
+    tsc $FILE.ts
 fi
 
 run_with_input "debug" "DEBUG"
