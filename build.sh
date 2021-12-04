@@ -44,10 +44,10 @@ echo -e "Building and running in: $BASE_PATH/$YEAR/$DAY\n"
 cd "$BASE_PATH/$YEAR/$DAY"
 
 if [ -z ${FILE+x} ]; then
-    if [ -f "partTwo.$LANG" ]; then
-        FILE="partTwo"
-    elif [ -f "partOne.$LANG" ]; then
-        FILE="partOne"
+    if [ -f "part-two.$LANG" ]; then
+        FILE="part-two"
+    elif [ -f "part-one.$LANG" ]; then
+        FILE="part-one"
     fi
 fi
 
