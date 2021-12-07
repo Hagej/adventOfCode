@@ -63,19 +63,15 @@ function findBingo(
 ): boolean {
   let rows = board.map((r) => 0);
   let columns = board.map((r) => 0);
-  // console.log(board);
   if (board.length > 5) console.log(board);
   for (let i = 0; i < board.length; i++) {
     for (let j = 0; j < board.length; j++) {
-      // console.log(board[i][j], i, j);
       if (board[i][j].marked) {
-        // console.log("Found marked! ", i, j);
         rows[i] += 1;
         columns[j] += 1;
       }
     }
   }
-  // console.log(rows, columns);
   if (rows.includes(board.length) || columns.includes(board.length)) {
     return true;
   }
