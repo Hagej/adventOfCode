@@ -1,4 +1,5 @@
 import { readFileSync } from "fs";
+import * as utils from "../utils";
 
 async function main() {
   let result = 0;
