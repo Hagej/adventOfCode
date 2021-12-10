@@ -22,9 +22,6 @@ async function main() {
   for (let i = 0; i < height; i++) {
     for (let j = 0; j < width; j++) {
       let isLowest = true;
-      if (j == 8 && i == 0) {
-        console.log(typeof values[i][j + 1] === "number");
-      }
       if (typeof values[i + 1] === "object" && values[i][j] >= values[i + 1][j])
         isLowest = false;
       if (typeof values[i - 1] === "object" && values[i][j] >= values[i - 1][j])
@@ -46,7 +43,6 @@ async function main() {
       }
     }
   }
-  // if (process.argv[2] == "debug") console.log(values);
   result = utils.sum(lows);
 
   console.log(result + lows.length);

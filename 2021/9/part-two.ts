@@ -22,9 +22,6 @@ async function main() {
   for (let i = 0; i < height; i++) {
     for (let j = 0; j < width; j++) {
       let isLowest = true;
-      if (j == 8 && i == 0) {
-        console.log(typeof values[i][j + 1] === "number");
-      }
       if (typeof values[i + 1] === "object" && values[i][j] >= values[i + 1][j])
         isLowest = false;
       if (typeof values[i - 1] === "object" && values[i][j] >= values[i - 1][j])
@@ -53,17 +50,11 @@ async function main() {
     .forEach((l) => {
       visited.push[(l[0][0], l[0][1])];
       basins.push(findBasin(values, l[0][0], l[0][1]));
-      // if (process.argv[2] == "debug") console.log(visited);
     });
 
   const [one, two, three] = basins.sort((a, b) => b - a);
 
   result = one * two * three;
-
-  const hej = [1, 2, 3];
-  for (const h of hej.entries()) {
-    console.log(h);
-  }
 
   console.log(result);
 }

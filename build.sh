@@ -52,7 +52,7 @@ if [ -z ${FILE+x} ]; then
 fi
 
 if [ "$LANG" == 'ts' ]; then 
-    tsc $FILE.ts
+    tsc --downlevelIteration --target=es2021 $FILE.ts
 fi
 
 run_with_input "debug" "DEBUG"
