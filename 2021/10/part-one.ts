@@ -23,7 +23,6 @@ async function main() {
 
   rows.map((r, index) => {
     loop: for (const c of r) {
-      // console.log(c, open, c in open);
       if (open.find((o) => o === c)) {
         queue.push(c);
       } else {
@@ -45,7 +44,6 @@ async function main() {
     0
   );
 
-  console.log(illegal);
   console.log(result);
 }
 
