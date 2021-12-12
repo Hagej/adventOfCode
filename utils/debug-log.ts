@@ -1,5 +1,5 @@
-export function debugLog(s: string) {
+export function debugLog(...s: any) {
   if (process.argv[2] === "debug") {
-    console.log(s);
+    console.log(...s);
   }
 }

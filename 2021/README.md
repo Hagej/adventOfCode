@@ -18,9 +18,9 @@ Below is a list of the times i got on each challenge
 | 6   | 7m48s  | 23m47s   |
 | 7   | 5m29s  | 14m51s   |
 | 8   | 11m37s | 3h10m11s |
-| 9   |        |          |
-| 10  |        |          |
-| 11  |        |          |
+| 9   | 27m49s | 1h6m12s  |
+| 10  | 19m58s | 43m12s   |
+| 11  | 21m26s | 24m12s   |
 | 12  |        |          |
 | 13  |        |          |
 | 14  |        |          |
