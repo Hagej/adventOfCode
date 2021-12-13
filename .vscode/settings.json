@@ -1,0 +1,7 @@
+{
+    "deno.enable": true,
+    "deno.unstable": true,
+    "deno.path": "/home/hage/.deno/bin/deno",
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "denoland.vscode-deno"
+}

@@ -27,7 +27,7 @@ run_with_input() {
     if [ -f "$INPUT" ]; then
         echo -e "RUNNING USING $NAME DATA\n"
         if [ "${LANG}" == "ts" ]; then
-            result=$(node $FILE.js $INPUT)
+            result=$(deno $FILE.js $INPUT)
         elif [ "${LANG}" == "py" ]; then
             result=$(python3 $FILE.py $INPUT)
         else 
