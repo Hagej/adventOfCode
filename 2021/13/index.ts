@@ -59,8 +59,8 @@ export async function one(inputFile: string) {
   });
 
   let result = 0;
-  let maxX = 0;
-  let maxY = 0;
+  let maxX = 0,
+    maxY = 0;
 
   coords.forEach((v) => {
     if (v[0] > maxX) maxX = v[0];
