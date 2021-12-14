@@ -11,17 +11,14 @@ async function main() {
   const path = `${year}/${day}`;
   const file = args["f"] ?? "index.ts";
 
-  const puzzle = await import(`./${path}/${file}`);
-
-  console.log(args);
-
+  let puzzle = await import(`./${path}/${file}`);
   runPuzzle(puzzle, path, args._[0] ? (args._[0] as number) : 1);
   if (args["w"]) {
     const watcher = Deno.watchFs(`./${path}/${file}`);
-    const func = debounce(
-      () => runPuzzle(puzzle, path, args._[0] ? (args._[0] as number) : 1),
-      300
-    );
+    const func = debounce(async () => {
+      puzzle = await import(`./${path}/${file}`);
+      runPuzzle(puzzle, path, args._[0] ? (args._[0] as number) : 1);
+    }, 300);
     for await (const event of watcher) {
       func();
     }
@@ -37,8 +34,6 @@ async function runPuzzle(puzzle: any, path: string, part: number) {
   console.log(`#======  DEBUG  ======#\n`);
   console.log(debugResult);
   console.log("\n#=====================#\n");
-
-  console.log(part);
 
   if (puzzle.expectedResult?.debug?.[part - 1])
     assertEquals(debugResult, puzzle.expectedResult?.debug?.[part - 1]);
