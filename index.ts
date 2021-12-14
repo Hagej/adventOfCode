@@ -12,11 +12,14 @@ async function main() {
   const file = args["f"] ?? "index.ts";
 
   let puzzle = await import(`./${path}/${file}`);
+  console.log(`Running puzzle ${year} day ${day}!`);
   runPuzzle(puzzle, path, args._[0] ? (args._[0] as number) : 1);
   if (args["w"]) {
     const watcher = Deno.watchFs(`./${path}/${file}`);
+    let saves = 0;
     const func = debounce(async () => {
-      puzzle = await import(`./${path}/${file}`);
+      saves++;
+      puzzle = await import(`./${path}/${file}?i=${saves}`);
       runPuzzle(puzzle, path, args._[0] ? (args._[0] as number) : 1);
     }, 300);
     for await (const event of watcher) {
