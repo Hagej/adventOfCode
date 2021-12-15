@@ -1,5 +1,3 @@
-import * as utils from "../../utils/index.ts";
-
 export function one(inputFile: string) {
   const file = Deno.readTextFileSync(inputFile);
   let [template, data] = file
@@ -25,7 +23,7 @@ export function one(inputFile: string) {
 
   const amounts: Record<string, number> = {};
   for (const char of template) {
-    if (!!amounts[char]) {
+    if (amounts[char]) {
       amounts[char]++;
     } else {
       amounts[char] = 1;
@@ -34,7 +32,7 @@ export function one(inputFile: string) {
 
   let min = Infinity,
     max = 0;
-  for (const [char, amount] of Object.entries(amounts)) {
+  for (const amount of Object.values(amounts)) {
     if (min > amount) min = amount;
     if (max < amount) max = amount;
   }
@@ -44,7 +42,7 @@ export function one(inputFile: string) {
 
 export function two(inputFile: string) {
   const file = Deno.readTextFileSync(inputFile);
-  let [template, data] = file
+  const [template, data] = file
     .trim()
     .split("\n\n")
     .map((r) => {
@@ -87,7 +85,7 @@ export function two(inputFile: string) {
   for (const [tuple, amount] of Object.entries(templatePairs).filter(
     (tp) => tp[1] > 0
   )) {
-    if (!!amounts[tuple[0]]) {
+    if (amounts[tuple[0]]) {
       amounts[tuple[0]] += amount;
     } else {
       amounts[tuple[0]] = amount;
@@ -97,7 +95,7 @@ export function two(inputFile: string) {
 
   let min = Infinity,
     max = 0;
-  for (const [char, amount] of Object.entries(amounts)) {
+  for (const amount of Object.values(amounts)) {
     if (min > amount) min = amount;
     if (max < amount) max = amount;
   }

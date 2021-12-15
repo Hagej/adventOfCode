@@ -9,7 +9,7 @@ export function one(inputFile: string) {
   let hp = 0;
   let vp = 0;
 
-  rows.map(([instruction, amount], index) => {
+  rows.map(([instruction, amount]) => {
     if (instruction === "forward") {
       hp += amount;
     }
@@ -38,7 +38,7 @@ export function two(inputFile: string) {
   let vp = 0;
   let aim = 0;
 
-  rows.map(([instruction, amount], index) => {
+  rows.map(([instruction, amount]) => {
     if (instruction === "forward") {
       hp += amount;
       vp += aim * amount;
