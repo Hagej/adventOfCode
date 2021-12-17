@@ -1,9 +1,0 @@
-{
-  "fmt": {
-    "options": {
-      "useTabs": true,
-      "indentWidth": 4,
-      "lineWidth": 160
-    }
-  }
-}
