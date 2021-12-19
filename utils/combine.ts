@@ -27,3 +27,24 @@ export function numArrayCombinations(numbers: number[]): number[] {
 	}
 	return result
 }
+
+// export function numArrayPermutations(numbers: number[]): Array<number[]> {
+// 	const result = []
+// 	for (let i = 0; i < numbers.length; i++) {
+// 		for (let j = 0; j < numbers.length; j++) {
+
+// 			result.push(numbers[i] + numbers[j])
+// 		}
+// 	}
+// 	return result
+// }
+
+function union<T>(a: T[], b: T[]) {
+	const result = a
+	for (const val of b) {
+		if (!result.includes(val)) {
+			result.push(val)
+		}
+	}
+	return result
+}

@@ -26,17 +26,17 @@ export function one(inputFile: string) {
 	const visited = new Set()
 	visited.add(0)
 
-	const queue = [0]
-	while (queue.length > 0) {
-		const i = queue.pop() as number
-		for (let j = 0; j < rows.length; j++) {
-			if (i === j || visited.has(j)) continue
+	const i = 0
+	while (Object.keys(positions).length < rows.length) {
+		for (let j = 1; j < rows.length; j++) {
+			if (visited.has(j)) continue
+
 			const distances: number[][][] = []
 
-			distances.push(Array.from(Array(rows[i].length), () => Array(rows[i].length).fill(0)))
-			for (let r = 0; r < rows[i].length; r++) {
-				for (let c = 0; c < rows[i].length; c++) {
-					const d = distance(rows[i][r], rows[i][c])
+			distances.push(Array.from(Array(rows[0].length), () => Array(rows[0].length).fill(0)))
+			for (let r = 0; r < rows[0].length; r++) {
+				for (let c = 0; c < rows[0].length; c++) {
+					const d = distance(rows[0][r], rows[0][c])
 					distances[0][r][c] = d
 					distances[0][c][r] = d
 				}
@@ -52,7 +52,7 @@ export function one(inputFile: string) {
 
 			let ik, il
 			let maxLength = 0
-			for (let k = 0; k < rows[i].length; k++) {
+			for (let k = 0; k < rows[0].length; k++) {
 				for (let l = 0; l < rows[j].length; l++) {
 					const inter = intersection(distances[0][k], distances[1][l])
 					if (inter.length >= 12 && maxLength < inter.length) {
@@ -63,12 +63,35 @@ export function one(inputFile: string) {
 				}
 			}
 			if (typeof ik === "number" && typeof il === "number") {
-				queue.push(j)
 				const mapping: [number, number][] = []
-				for (let k = 0; k < rows[i].length; k++) {
+				for (let k = 0; k < rows[0].length; k++) {
 					for (let l = 0; l < rows[j].length; l++) {
 						if (distances[1][il][l] === distances[0][ik][k]) {
-							mapping.push([k, l])
+							let samesies = false
+							xloop: for (let x = 0; x < distances[1][il].length; x++) {
+								for (let y = x + 1; y < distances[1][il].length; y++) {
+									if (distances[1][il][x] === distances[1][il][y]) {
+										samesies = true
+										break xloop
+									}
+								}
+							}
+
+							if (samesies) {
+								const i1 = intersection(distances[0][k], distances[1][l]).length
+								const temp = ik
+								const index = distances[1][ik].slice(l).findIndex((v) => v === distances[1][temp][l]) as number
+								const i2 = intersection(distances[0][index], distances[1][l]).length
+
+								console.log(i1, i2)
+								if (i1 >= i2) {
+									mapping.push([k, l])
+								} else {
+									mapping.push([index, l])
+								}
+							} else {
+								mapping.push([k, l])
+							}
 						}
 					}
 				}
@@ -81,106 +104,20 @@ export function one(inputFile: string) {
 					rows[j][k] = beaconPos
 					beacons.add(`${beaconPos[0]},${beaconPos[1]},${beaconPos[2]}`)
 				}
+
+				rows[i] = union(rows[i], rows[j])
 				visited.add(j)
 			}
 		}
 	}
-	return beacons.size
+
+	console.log(positions)
+	console.log(rows[0].sort((a, b) => a[0] - b[0]))
+	return rows[0].length
 }
 
 export function two(inputFile: string) {
-	const file = Deno.readTextFileSync(inputFile)
-	const rows: [number, number, number][][] = file
-		.trim()
-		.split("\n\n")
-		.map((g) =>
-			g
-				.split("\n")
-				.filter((r) => !r.startsWith("---"))
-				.map((r) => {
-					const [x, y, z] = r.split(",").map((i) => parseInt(i))
-					return [x, y, z]
-				}),
-		)
-
-	const positions: Record<string, Vec3> = { "0": [0, 0, 0] }
-	const beacons = new Set<string>()
-	for (const r of rows[0]) {
-		beacons.add(`${r[0]},${r[1]},${r[2]}`)
-	}
-
-	const visited = new Set()
-	visited.add(0)
-
-	const queue = [0]
-	while (queue.length > 0) {
-		const i = queue.pop() as number
-		for (let j = 0; j < rows.length; j++) {
-			if (i === j || visited.has(j)) continue
-			const distances: number[][][] = []
-
-			distances.push(Array.from(Array(rows[i].length), () => Array(rows[i].length).fill(0)))
-			for (let r = 0; r < rows[i].length; r++) {
-				for (let c = 0; c < rows[i].length; c++) {
-					const d = distance(rows[i][r], rows[i][c])
-					distances[0][r][c] = d
-					distances[0][c][r] = d
-				}
-			}
-			distances.push(Array.from(Array(rows[j].length), () => Array(rows[j].length).fill(0)))
-			for (let r = 0; r < rows[j].length; r++) {
-				for (let c = 0; c < rows[j].length; c++) {
-					const d = distance(rows[j][r], rows[j][c])
-					distances[1][r][c] = d
-					distances[1][c][r] = d
-				}
-			}
-
-			let ik, il
-			let maxLength = 0
-			for (let k = 0; k < rows[i].length; k++) {
-				for (let l = 0; l < rows[j].length; l++) {
-					const inter = intersection(distances[0][k], distances[1][l])
-					if (inter.length >= 12 && maxLength < inter.length) {
-						maxLength = inter.length
-						ik = k
-						il = l
-					}
-				}
-			}
-			if (typeof ik === "number" && typeof il === "number") {
-				queue.push(j)
-				const mapping: [number, number][] = []
-				for (let k = 0; k < rows[i].length; k++) {
-					for (let l = 0; l < rows[j].length; l++) {
-						if (distances[1][il][l] === distances[0][ik][k]) {
-							mapping.push([k, l])
-						}
-					}
-				}
-				const [m1, m2] = mapping
-				const r = findRotation(rows[i][m1[0]], rows[i][m2[0]], rows[j][m1[1]], rows[j][m2[1]])
-				const pos = findScannerPosition(rows[i][m1[0]], rows[j][m1[1]], r)
-				positions[j] = pos
-				for (let k = 0; k < rows[j].length; k++) {
-					const beaconPos = findBeaconPosition(pos, rows[j][k], r)
-					rows[j][k] = beaconPos
-					beacons.add(`${beaconPos[0]},${beaconPos[1]},${beaconPos[2]}`)
-				}
-				visited.add(j)
-			}
-		}
-	}
-
-	let max = 0
-	for (let i = 0; i < Object.values(positions).length; i++) {
-		for (let j = i + 1; j < Object.values(positions).length; j++) {
-			const dist = vec3Subtract(positions[i], positions[j])
-			max = Math.max(utils.sum(dist.map((v) => Math.abs(v))), max)
-		}
-	}
-
-	return max
+	throw new Error("Not implemented")
 }
 
 function intersection<T>(a: T[], b: T[]) {
