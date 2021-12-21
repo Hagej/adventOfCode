@@ -21,7 +21,7 @@ export function numArrayCombine(a: number[], b: number[]) {
 export function numArrayCombinations(numbers: number[]): number[] {
 	const result = []
 	for (let i = 0; i < numbers.length; i++) {
-		for (let j = i + 1; j < numbers.length; j++) {
+		for (let j = 0; j < numbers.length; j++) {
 			result.push(numbers[i] + numbers[j])
 		}
 	}
