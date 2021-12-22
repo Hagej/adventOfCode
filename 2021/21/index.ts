@@ -45,117 +45,134 @@ export function two(inputFile: string) {
 
 	const startingPos = rows.map((r) => parseInt(r.split(": ")[1]))
 
-	console.log(diceRolls, diceRolls.length, m)
-
 	before = performance.now()
-
-	findWinner([startingPos[0], 0], [startingPos[1], 0], 0)
+	findWinner(
+		[
+			[startingPos[0], 0],
+			[startingPos[1], 0],
+		],
+		0,
+	)
 
 	return Math.max(...winAmount)
 }
 
 const winAmount = [0, 0]
+const earlyReturns = [0, 0]
 let iters = 0
+const maxes: number[] = Array(5).fill(0)
 
-const diceRolls = utils.numArrayCombine([1, 2, 3], utils.numArrayCombinations([1, 2, 3])).sort((a, b) => a - b)
+const diceRolls = utils.numArrayCombine([1, 2, 3], utils.numArrayCombine([1, 2, 3], [1, 2, 3])).sort((a, b) => a - b)
+const diceRolls2 = utils.numArrayCombine(diceRolls, diceRolls).sort((a, b) => a - b)
 const m = diceRolls.reduce((prev, d) => ({ ...prev, [d]: (prev[d] ?? 0) + 1 }), {} as Record<number, number>)
+const distribution = Object.values(m)
+distribution.unshift(0)
+distribution.unshift(0)
 
-function findWinner(p1: [number, number], p2: [number, number], turn: number) {
+let iterPerf = 1000000
+
+function findWinner(values: [[number, number], [number, number]], playerIndex: number) {
 	iters++
-	if (iters == 1000000) console.log(performance.now() - before)
-	if (turn == 0) {
-		if (p1[1] == 20) {
-			winAmount[turn] += 27
+	if (iters == iterPerf) {
+		iterPerf *= 10
+		console.log(`${iters} iterations took ${performance.now() - before} ms`)
+		console.log(winAmount, earlyReturns, maxes)
+	}
+	const player = values[playerIndex]
+	const other = values[(playerIndex + 1) % 2]
+	if (playerIndex === 0) {
+		const maxt = maxTurns(player[0], player[1])
+		const mint = minTurns(other[0], other[1])
+		if (mint >= maxt) {
+			earlyReturns[0]++
+			maxes[maxt]++
+			winAmount[playerIndex] += 27 ** maxt
 			return
-		}
-		for (let i = 3; i <= 9; i++) {
-			const p = ((p1[1] + i - 1) % 10) + 1
-			const mi = m[i]
-			if (p + p1[1] >= 21) {
-				winAmount[turn] += mi
-			} else {
-				for (let j = 0; j < mi; j++) {
-					findWinner([p, p + p1[1]], p2, 1)
-				}
-			}
 		}
 	} else {
-		if (p2[1] == 20) {
-			winAmount[turn] += 27
+		const maxt = maxTurns(other[0], other[1])
+		const mint = minTurns(player[0], player[1])
+		if (mint > maxt) {
+			earlyReturns[1]++
+			maxes[maxt]++
+			winAmount[(playerIndex + 1) % 2] += 27 ** maxt
 			return
 		}
-		for (let i = 3; i <= 9; i++) {
-			const p = ((p2[1] + i - 1) % 10) + 1
-			const mi = m[i]
-			if (p + p2[1] >= 21) {
-				winAmount[turn] += mi
-			} else {
-				for (let j = 0; j < mi; j++) {
-					findWinner(p1, [p, p + p2[1]], 0)
-				}
+	}
+	//
+	// let min = player[0] + 9 > 10 ? 1 : player[0] + 3
+	// let max = Math.min(player[0] + 9, 10)
+	// let omin = other[0] + 9 > 10 ? 1 : other[0] + 3
+	// let omax = Math.min(other[0] + 9, 10)
+	// // console.log(getMin(player[0], 2), getMax(player[0], 2), getMin(other[0], 2))
+	// if (player[1] + min >= 21) {
+	// 	winAmount[playerIndex] += 27
+	// 	earlyReturns[0]++
+	// 	return
+	// } else if (player[1] + max < 21 && other[1] + omin >= 21) {
+	// 	earlyReturns[1]++
+	// 	winAmount[(playerIndex + 1) % 2] += 27 ** 2
+	// } else if (other[1] + omax < 21 && player[1] + getMin(player[0], 2) >= 21) {
+	// 	earlyReturns[2]++
+	// 	winAmount[playerIndex] += 27 ** 3
+	// 	return
+	// } else if (player[1] + getMax(player[0], 2) < 21 && other[1] + getMin(other[0], 2) >= 21) {
+	// 	earlyReturns[3]++
+	// 	winAmount[(playerIndex + 1) % 2] += 27 ** 4
+	// 	return
+	// }
+
+	for (let i = 3; i <= 9; i++) {
+		const p = ((player[0] + i - 1) % 10) + 1
+		if (p + player[1] >= 21) {
+			winAmount[playerIndex] += m[i]
+		} else {
+			const newValues: [[number, number], [number, number]] = playerIndex == 0 ? [[p, p + player[1]], values[1]] : [values[0], [p, p + player[1]]]
+			for (let j = 0; j < m[i]; j++) {
+				findWinner(newValues, (playerIndex + 1) % 2)
 			}
 		}
 	}
 }
 
-export function two1(inputFile: string) {
-	const file = Deno.readTextFileSync(inputFile)
-	const rows = file
-		.trim()
-		.split("\n")
-		.map((r) => {
-			const row = r
-			return row
-		})
+function maxTurns(pos: number, s: number) {
+	let turns = 0
+	let score = s
 
-	const startingPos = rows.map((r) => parseInt(r.split(": ")[1]))
-	let positions = [[startingPos[0], startingPos[1]]]
-	let scores = [[0, 0]]
-	let values: Array<[[number, number], [number, number]]> = [
-		[
-			[startingPos[0], 0],
-			[startingPos[1], 0],
-		],
-	]
-
-	const wins = [0, 0]
-	let round = 0
-	while (positions.length > 0) {
-		const player = round % 2
-
-		// const newPositions = []
-		// const newScores = []
-		const newValues: Array<[[number, number], [number, number]]> = []
-		while (values.length > 0) {
-			const value = values.pop() as [[number, number], [number, number]]
-			let posOutcomes = [value[player][0]]
-			for (let j = 0; j < 3; j++) {
-				posOutcomes = posOutcomes.reduce((prev, o) => [...prev, o + 1, o + 2, o + 3], [] as number[])
-			}
-			for (let j = 0; j < posOutcomes.length; j++) {
-				if (posOutcomes[j] > 10) posOutcomes[j] -= 10
-			}
-			const scoreOutcomes = posOutcomes.map((p) => p + value[player][1])
-			for (let j = 0; j < posOutcomes.length; j++) {
-				if (scoreOutcomes[j] >= 21) {
-					console.log(value)
-					wins[player]++
-				} else {
-					newValues.push(player == 0 ? [[posOutcomes[j], scoreOutcomes[j]], value[1]] : [value[0], [posOutcomes[j], scoreOutcomes[j]]])
-					// newScores.push(player == 0 ? [scoreOutcomes[j], score[1]] : [score[0], scoreOutcomes[j]])
-					// newPositions.push(player == 0 ? [posOutcomes[j], pos[1]] : [pos[0], posOutcomes[j]])
-				}
-			}
-		}
-
-		console.log(newValues.length)
-		values = newValues
-		// positions = newPositions
-		// scores = newScores
-		round++
+	const flip = pos === 1 ? 0 : 1
+	while (score < 21) {
+		turns++
+		score += 4 ** ((flip + turns) % 2)
 	}
-	console.log(round)
-	return Math.max(...wins)
+	return turns
+}
+
+function minTurns(p: number, s: number) {
+	if (s > 13 || (s == 11 && p <= 7) || (s == 12 && (p <= 7 || p >= 9)) || (s == 13 && p != 8)) return 1
+	if (s > 1) return 2
+	return 3
+}
+
+function getMax(pos: number, turns: number) {
+	let max = 0
+	for (let i = 1; i <= turns; i++) {
+		if (pos <= 7) {
+			max += 10
+			pos = 10
+		} else {
+			pos--
+			max += pos
+		}
+	}
+	return max
+}
+function getMin(pos: number, turns: number) {
+	const flip = pos === 1 ? 0 : 1
+	let min = 0
+	for (let i = 1; i <= turns; i++) {
+		min += 4 ** ((flip + i) % 2)
+	}
+	return min
 }
 
 export const expectedResult = {

@@ -36,8 +36,8 @@ async function runPuzzle(puzzle: any, path: string, part: number) {
 	console.log("\n#=====================#\n")
 
 	if (puzzle.expectedResult?.debug?.[part - 1] && puzzle.expectedResult.debug[part - 1] !== debugResult) {
-		console.log(`Debug failed. Expected ${puzzle.expectedResult.debug}, got ${debugResult}`)
-		Deno.exit(0)
+		console.log(`Debug failed. Expected ${puzzle.expectedResult.debug[part - 1]}, got ${debugResult}`)
+		return
 	}
 
 	const result = part === 2 ? await puzzle.two(`${path}/input`) : await puzzle.one(`${path}/input`)

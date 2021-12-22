@@ -2,7 +2,7 @@ export function strArrayCombine(a: string[], b: (number | string)[]): string[] {
 	const result = []
 	for (const aVal of a) {
 		for (const bVal of b) {
-			result.push(aVal + bVal)
+			result.push(`${aVal}${bVal}`)
 		}
 	}
 	return result
@@ -21,30 +21,30 @@ export function numArrayCombine(a: number[], b: number[]) {
 export function numArrayCombinations(numbers: number[]): number[] {
 	const result = []
 	for (let i = 0; i < numbers.length; i++) {
-		for (let j = 0; j < numbers.length; j++) {
+		for (let j = i + 1; j < numbers.length; j++) {
 			result.push(numbers[i] + numbers[j])
 		}
 	}
 	return result
 }
 
-// export function numArrayPermutations(numbers: number[]): Array<number[]> {
-// 	const result = []
-// 	for (let i = 0; i < numbers.length; i++) {
-// 		for (let j = 0; j < numbers.length; j++) {
+export function permutations(numbers: number[]): Array<number[]> {
+	let result: Array<number[]> = []
+	if (numbers.length === 0) return result
+	if (numbers.length === 1) return [numbers]
 
-// 			result.push(numbers[i] + numbers[j])
-// 		}
-// 	}
-// 	return result
-// }
-
-function union<T>(a: T[], b: T[]) {
-	const result = a
-	for (const val of b) {
-		if (!result.includes(val)) {
-			result.push(val)
+	for (let i = 0; i < numbers.length; i++) {
+		const currentNum = numbers[i]
+		const remainingNums = numbers.slice(0, i).concat(numbers.slice(i + 1))
+		const remainingNumsPermuted = permutations(remainingNums)
+		for (let j = 0; j < remainingNumsPermuted.length; j++) {
+			const permutedArray = [currentNum, ...remainingNumsPermuted[j]]
+			result.push(permutedArray)
 		}
 	}
 	return result
+}
+
+export function union(a: Array<string | number | boolean>, b: Array<string | number | boolean>) {
+	return [...new Set([...a, ...b])]
 }
