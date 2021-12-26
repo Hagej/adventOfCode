@@ -108,9 +108,43 @@ export function one(inputFile: string) {
 		),
 	)
 
+	// mul x 0
+	// add x z
+	// mod x 26
+	// div z 26
+	// add x -14
+	// eql x w
+	// eql x 0
+	// mul y 0
+	// add y 25
+	// mul y x
+	// add y 1
+	// mul z y
+	// mul y 0
+	// add y w
+	// add y 13
+	// mul y x
+	// add z y
+
+	const funky = (values: Coords) => {
+		values.x = ((0 + values.z) % 26) - 14
+		values.z = Math.floor(values.z / 26)
+		values.x = values.x === values.w ? 0 : 1
+		values.y = 25 * values.x + 1
+		values.z *= values.y
+		values.y = (13 + values.w) * values.x
+		values.z += values.y
+		return values
+	}
+
+	const test = false
+	if (test) {
+		func[13] = funky
+	}
+
 	const valid = new Set()
 
-	for (let i = 9; i > 0; i--) {
+	for (let i = 1; i > 0; i--) {
 		findValid({ w: i, x: 0, y: 0, z: 0 }, `${i}`)
 	}
 
@@ -123,6 +157,7 @@ let iterAmount = 1000000
 let cacheHits = 0
 const time = performance.now()
 const cache: Record<string, Coords> = {}
+const testInput = "13579246899999"
 
 function findValid(coords: Coords, input: string): boolean | string {
 	iters++
@@ -150,7 +185,8 @@ function findValid(coords: Coords, input: string): boolean | string {
 		return coords.z === 0
 	}
 	let result: string | boolean = false
-	for (let i = 9; i > 0; i--) {
+	const s = testInput ? parseInt(testInput[input.length]) : 9
+	for (let i = s; i > 0; i--) {
 		coords.w = i
 		const r = findValid({ ...coords }, `${input}${i}`)
 		if (typeof r === "string") {
