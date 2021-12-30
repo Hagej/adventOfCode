@@ -7,7 +7,6 @@ def parse(file):
     return rows
 
 
-vowel = {"a", "e", "i", "o", "u"}
 naughtyPairs = {"ab", "cd", "pq", "xy"}
 
 
@@ -28,7 +27,7 @@ def solve(data):
                     break
                 if pair[0] == pair[1]:
                     hasDouble = True
-            if row[c] in vowel:
+            if row[c] in "aeiou":
                 vowels += 1
         if not naughty and vowels >= 3 and hasDouble:
             result1 += 1

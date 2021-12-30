@@ -9,6 +9,10 @@ def parse(file):
 def solve(data):
     result_one, result_two = 0, 0
 
+    for row in data:
+        result_one += len(row) - len(eval(row))
+        result_two += len(repr(row).replace('"', '\\"')) - len(row)
+
     return (result_one, result_two)
 
 
