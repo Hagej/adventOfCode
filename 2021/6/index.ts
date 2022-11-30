@@ -1,7 +1,8 @@
-import { sum } from "../../utils/index.ts"
+import fs from "fs"
+import { sum } from "../../utils"
 
 export function one(inputFile: string) {
-	const file = Deno.readTextFileSync(inputFile)
+	const file = fs.readFileSync(inputFile, "utf-8")
 	const rows = file
 		.trim()
 		.split(",")
@@ -19,7 +20,7 @@ export function one(inputFile: string) {
 }
 
 export function two(inputFile: string) {
-	const file = Deno.readTextFileSync(inputFile)
+	const file = fs.readFileSync(inputFile, "utf-8")
 	const rows = file
 		.trim()
 		.split(",")

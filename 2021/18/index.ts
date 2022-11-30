@@ -1,5 +1,6 @@
+import fs from "fs"
 export function one(inputFile: string) {
-	const file = Deno.readTextFileSync(inputFile)
+	const file = fs.readFileSync(inputFile, "utf-8")
 	const rows = file
 		.trim()
 		.split("\n")
@@ -25,7 +26,7 @@ export function one(inputFile: string) {
 }
 
 export function two(inputFile: string) {
-	const file = Deno.readTextFileSync(inputFile)
+	const file = fs.readFileSync(inputFile, "utf-8")
 	const rows = file
 		.trim()
 		.split("\n")

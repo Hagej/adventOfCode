@@ -1,7 +1,7 @@
-export * from "./array-compare.ts"
-export * from "./array-maths.ts"
-export * from "./combine.ts"
-export * from "./graph.ts"
+export * from "./array-compare"
+export * from "./array-maths"
+export * from "./combine"
+export * from "./graph"
 
 export function logImage(output: string[][]) {
 	console.log("-".repeat(output[0].length))

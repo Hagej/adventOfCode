@@ -14,12 +14,14 @@ year.
 > As an experiment i've started converting to run everything in
 > <a href="https://https://deno.land/">Deno</a> instead!
 
+[2022](./2022/README.md) - Typescript (timed)
+
 ## Instructions
 
 ### Dependencies
 
 Make sure you have
-<a href="https://deno.land/#installation">Deno</a> installed. That't it!
+<a href="https://bun.sh/">Bun</a> installed. That's it!
 
 ### Input
 
@@ -40,7 +42,7 @@ This script only works if there is a `.env` file in the repo root with an
 To run the code for any year and day run:
 
 ```
-deno run --allow-read index.ts -y YEAR -d DAY PART
+bun run index.ts -y YEAR -d DAY PART
 ```
 
 `PART` decides wether to run part one or two. One is default

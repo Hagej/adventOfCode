@@ -8,6 +8,10 @@ export function strArrayCombine(a: string[], b: (number | string)[]): string[] {
 	return result
 }
 
+/**
+ *
+ * @returns an array containing all the sums of all the possible pairs of values between the arrays
+ */
 export function numArrayCombine(a: number[], b: number[]) {
 	const result = []
 	for (const aVal of a) {

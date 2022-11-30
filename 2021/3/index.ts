@@ -1,6 +1,8 @@
+import fs from "fs"
+
 export async function one(inputFile: string) {
 	let result = 0
-	const file = Deno.readTextFileSync(inputFile)
+	const file = fs.readFileSync(inputFile, "utf-8")
 	const rows = file.split("\n").map((r) => {
 		const row = r
 		return r
@@ -33,7 +35,7 @@ export async function one(inputFile: string) {
 }
 
 export function two(inputFile: string) {
-	const file = Deno.readTextFileSync(inputFile)
+	const file = fs.readFileSync(inputFile, "utf-8")
 	const rows = file.split("\n").map((r) => {
 		const row = r
 		return r

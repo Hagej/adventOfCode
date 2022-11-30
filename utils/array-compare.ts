@@ -1,3 +1,7 @@
+/**
+ * Compare two arrays of strings
+ * @returns The amount of strings that only exists in one array
+ */
 export function strArrayCompare(a: string[], b: string[]): number {
 	const c = [...b]
 	a.forEach((str) => {
@@ -8,6 +12,10 @@ export function strArrayCompare(a: string[], b: string[]): number {
 	return Math.max(a.length, b.length) - c.length
 }
 
+/**
+ * Compare two arrays of strings
+ * @returns True if the array contents are the same
+ */
 export function strArrayEquals(a: string[], b: string[]): boolean {
 	return strArrayCompare(a, b) === Math.max(a.length, b.length)
 }

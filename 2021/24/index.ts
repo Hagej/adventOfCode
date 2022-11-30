@@ -1,4 +1,4 @@
-import * as utils from "../../utils/index.ts"
+import * as utils from "../../utils"
 
 interface Coords {
 	w: number
@@ -181,7 +181,6 @@ function findValid(coords: Coords, input: string): boolean | string {
 	if (input.length === 14) {
 		if (coords.z === 0) {
 			console.log(input)
-			Deno.exit()
 		}
 		return coords.z === 0
 	}

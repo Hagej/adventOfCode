@@ -1,8 +1,9 @@
-import * as utils from "../../utils/index.ts"
+import * as utils from "../../utils"
+import fs from "fs"
 
 export function one(inputFile: string) {
 	let result = 0
-	const file = Deno.readTextFileSync(inputFile)
+	const file = fs.readFileSync(inputFile, "utf-8")
 	const [algo, inputData] = file
 		.trim()
 		.split("\n\n")
@@ -81,7 +82,7 @@ export function one(inputFile: string) {
 
 export function two(inputFile: string) {
 	let result = 0
-	const file = Deno.readTextFileSync(inputFile)
+	const file = fs.readFileSync(inputFile, "utf-8")
 	const [algo, inputData] = file
 		.trim()
 		.split("\n\n")

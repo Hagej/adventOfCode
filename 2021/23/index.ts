@@ -1,4 +1,4 @@
-import * as utils from "../../utils/index.ts"
+import fs from "fs"
 
 type Vec2 = [number, number]
 type Dir = "UP" | "DOWN" | "LEFT" | "RIGHT"
@@ -22,7 +22,7 @@ const homeX: Record<Pod, number> = {
 }
 let homeSize = 0
 export function one(inputFile: string) {
-	const file = Deno.readTextFileSync(inputFile)
+	const file = fs.readFileSync(inputFile, "utf-8")
 	const board = file
 		.trim()
 		.split("\n")
@@ -92,7 +92,7 @@ export function one(inputFile: string) {
 }
 
 export function two(inputFile: string) {
-	const file = Deno.readTextFileSync(inputFile)
+	const file = fs.readFileSync(inputFile, "utf-8")
 	homeSize = 4
 
 	const board = file

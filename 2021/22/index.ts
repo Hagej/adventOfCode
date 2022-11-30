@@ -1,8 +1,8 @@
-import * as utils from "../../utils/index.ts"
+import fs from "fs"
 
 export function one(inputFile: string) {
 	let result = 0
-	const file = Deno.readTextFileSync(inputFile)
+	const file = fs.readFileSync(inputFile, "utf-8")
 	const rows: [string, [[number, number], [number, number], [number, number]]][] = file
 		.trim()
 		.split("\n")
@@ -69,7 +69,7 @@ export function one(inputFile: string) {
 type Cube = [[number, number], [number, number], [number, number]]
 
 export function two(inputFile: string) {
-	const file = Deno.readTextFileSync(inputFile)
+	const file = fs.readFileSync(inputFile, "utf-8")
 	const rows: [string, Cube][] = file
 		.trim()
 		.split("\n")

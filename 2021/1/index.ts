@@ -1,13 +1,15 @@
+import fs from "fs"
+
 export async function one(inputFile: string) {
-	const file = await Deno.readTextFile(inputFile)
+	const file = fs.readFileSync(inputFile, "utf-8")
+
 	const rows = file.split("\n").map((r) => {
 		return parseInt(r)
 	})
-
 	let result = 0
 	let cur
 	let prev
-	for (let i = 0; i < rows.length - 2; i++) {
+	for (let i = 0; i < rows.length; i++) {
 		cur = rows[i]
 		if (prev && cur > prev) {
 			result++
@@ -19,7 +21,7 @@ export async function one(inputFile: string) {
 }
 
 export async function two(inputFile: string) {
-	const file = await Deno.readTextFile(inputFile)
+	const file = fs.readFileSync(inputFile, "utf-8")
 	const rows = file.split("\n").map((r) => {
 		return parseInt(r)
 	})
