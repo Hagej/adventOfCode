@@ -1,4 +1,5 @@
 import * as utils from "../../utils"
+import fs from "fs"
 
 type Vec3 = [number, number, number]
 

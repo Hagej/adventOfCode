@@ -9,7 +9,6 @@ export function strArrayCombine(a: string[], b: (number | string)[]): string[] {
 }
 
 /**
- *
  * @returns an array containing all the sums of all the possible pairs of values between the arrays
  */
 export function numArrayCombine(a: number[], b: number[]) {
@@ -22,6 +21,9 @@ export function numArrayCombine(a: number[], b: number[]) {
 	return result
 }
 
+/**
+ * @returns an array containing all the possible sums of values within the array
+ */
 export function numArrayCombinations(numbers: number[]): number[] {
 	const result = []
 	for (let i = 0; i < numbers.length; i++) {
