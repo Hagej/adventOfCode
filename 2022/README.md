@@ -11,7 +11,7 @@ Below is a list of the times i got on each challenge
 | Day | Part 1 | Part 2 |
 | --- | ------ | ------ |
 | 1   | 3m26s  | 6m4s   |
-| 2   |        |        |
+| 2   | 13m23s | 26m55s |
 | 3   |        |        |
 | 4   |        |        |
 | 5   |        |        |
