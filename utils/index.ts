@@ -2,6 +2,7 @@ export * from "./array-compare"
 export * from "./array-maths"
 export * from "./combine"
 export * from "./graph"
+export * from "./memoize"
 
 export function logImage(output: string[][]) {
 	console.log("-".repeat(output[0].length))
