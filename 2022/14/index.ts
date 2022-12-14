@@ -33,7 +33,6 @@ export function one(inputFile: string) {
 
 	function moveSand(pos: [number, number]) {
 		const [x, y] = pos
-		//console.log(x, y, map[y + 1][x])
 		if (y > LP) return [x, y]
 		if (map[y + 1][x] === ".") {
 			return moveSand([x, y + 1])
@@ -51,15 +50,12 @@ export function one(inputFile: string) {
 		const cur: [number, number] = [SP[0], SP[1]]
 		const [x, y] = moveSand(cur)
 		if (y > LP) {
-			console.log("Found the end", x, y)
 			map[y][x] = "~"
 			break
 		}
 		map[y][x] = "o"
 		result++
 	}
-
-	utils.logImage(map)
 
 	return result
 }
@@ -93,7 +89,6 @@ export function two(inputFile: string) {
 			LP = Math.max(LP, coords[i][1], coords[i + 1][1])
 		}
 	})
-	console.log(LP + 2)
 	for (let x = 0; x < 800; x++) {
 		map[LP + 2][x] = "#"
 	}
@@ -118,7 +113,6 @@ export function two(inputFile: string) {
 		map[y][x] = "o"
 		result++
 		if (x === 500 && y === 0) {
-			console.log("Found the end")
 			break
 		}
 	}

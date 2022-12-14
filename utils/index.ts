@@ -16,3 +16,11 @@ export function logImage(output: string[][]) {
 	}
 	console.log("-".repeat(output[0].length))
 }
+
+export function zip(a: Array<any>, b: Array<any>) {
+	const pairs = []
+	for (let i = 0; i < Math.min(a.length, b.length); i++) {
+		pairs.push([a[i], b[i]])
+	}
+	return pairs
+}
