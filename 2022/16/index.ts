@@ -7,6 +7,7 @@ interface Valve {
 }
 export function one(inputFile: string) {
 	let result = 0
+	weights = {}
 	const file = fs.readFileSync(inputFile, "utf-8")
 	const rows = file
 		.trim()
