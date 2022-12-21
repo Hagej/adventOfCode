@@ -22,4 +22,6 @@ echo "$YEAR $DAY"
 mkdir -p "${YEAR}/${DAY}"
 curl "${URL}" -H "cookie: session=${AOC_SESSION_COOKIE}" -o "${FILE}" -v
 
-cp -a frame/. "${YEAR}/${DAY}"
+if [ ! -f "${YEAR}/${DAY}/index.ts" ]; then
+    cp -a frame/. "${YEAR}/${DAY}"
+fi
