@@ -160,7 +160,7 @@ export function two(inputFile: string) {
 	let sx = 0
 
 	const V = new Set<string>()
-	const Q: [[number, number], [number, number, number]] = []
+	const Q: [[number, number], [number, number, number]][] = []
 	for (let x = 0; x < width / side; x++) {
 		if (map[0][x * 50 - 1] !== " ") {
 			sx = x
@@ -168,19 +168,33 @@ export function two(inputFile: string) {
 		}
 	}
 	V.add(`${sx},${sy}`)
-	if (isSide((sx + 1) * 50, sy * 50))
-		Q.push([
-			[sx, sy],
-			[4, 0, 0],
-		])
-	if (isSide(sx * 50, (sy + 1) * 50))
-		Q.push([
-			[sx, sy],
-			[0, 4, 0],
-		])
+	Q.push([[sx, sy], [0, 0, 1]])
+	// if (isSide((sx + 1) * 50, sy * 50))
+	// 	Q.push([
+	// 		[sx, sy],
+	// 		[4, 0, 0],
+	// 	])
+	// if (isSide(sx * 50, (sy + 1) * 50))
+	// 	Q.push([
+	// 		[sx, sy],
+	// 		[0, 4, 0],
+	// 	])
 
 	while (Q.length > 0) {
-		const cur = Q.pop()
+		const [pos, axis] = Q.shift()
+		if(axis[0] > 0) {
+			for(let y = 0; y < side; y++) {
+				for(let z = 0; z < side; z++) {
+					cube[z][y][axis[0]] = map[y + pos[0] * 50][z + pos[1] * 50]
+				}
+			}
+		} else if (axis[1] > 0) {
+			for(let y = 0; y < side; y++) {
+				for(let z = 0; z < side; z++) {
+					cube[z][y][axis[0]] = map[y + pos[0] * 50][z + pos[1] * 50]
+				}
+			}
+		} else if(axis[2] > 0)
 	}
 
 	for (const [y, str] of map.entries()) {
