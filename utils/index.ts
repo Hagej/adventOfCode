@@ -24,3 +24,13 @@ export function zip(a: Array<any>, b: Array<any>) {
 	}
 	return pairs
 }
+
+export function ratio(a: number, b: number) {
+	for (let i = b; i > 1; i--) {
+		if (a % i == 0 && b % i == 0) {
+			a /= i
+			b /= i
+		}
+	}
+	return [a, b]
+}
