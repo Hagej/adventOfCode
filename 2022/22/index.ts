@@ -1,10 +1,10 @@
 import * as utils from "@utils"
 import fs from "fs"
-import { createBuilderStatusReporter } from "typescript"
+import { createBuilderStatusReporter, idText } from "typescript"
 
 let columns: Map<number, [number, string][]>
 let rows: Map<number, [number, string][]>
-let map: string[] = []
+let map: string[][] = []
 
 export function one(inputFile: string) {
 	let result = 0
@@ -19,7 +19,6 @@ export function one(inputFile: string) {
 		const chars = str.split("")
 		for (const [x, ch] of chars.entries()) {
 			if (ch !== " ") {
-				if (ch !== "#" && ch != ".") console.log(ch)
 				if (!start && ch === ".") start = [x + 1, y + 1]
 
 				columns.set(x + 1, [...(columns.get(x + 1) || []), [y + 1, ch]])
@@ -42,7 +41,6 @@ export function one(inputFile: string) {
 	let pos = start
 	let dir = 0
 	for (const move of inst) {
-		console.log(dir / Math.PI)
 		if (typeof move === "number") {
 			for (let i = 0; i < move; i++) {
 				const next = findNext(pos, dir)
@@ -100,32 +98,148 @@ function findNext(pos: [number, number], dir: number): [number, number] {
 	return [x, column[column.length - 1][0]]
 }
 
-function findNextTwo(pos: [number, number], dir: number, side: number): [number, number] {
+function findNextTwo(pos: [number, number], dir: number, side: Side): [number, [number, number] | number] {
 	let [x, y] = pos
 	let [dx, dy] = [Math.round(Math.cos(dir)), -Math.round(Math.sin(dir))]
+	const [nx, ny] = [x + dx, y + dy]
 
-	const row = rows.get(y + dy)
-	if (row && row.find((r) => r[0] === x + dx)) {
-		return row.find((r) => r[0] === x + dx)[1] === "." ? [x + dx, y + dy] : undefined
+	if (ny >= 0 && ny <= map.length - 1 && nx >= 0 && nx <= map[0].length - 1 && map[ny][nx] !== " ") {
+		return map[ny][nx] === "." ? [dir, [nx, ny]] : [dir, 0]
 	}
 
-	const [sx, sy] = [Math.floor(x / side), Math.floor(y / side)]
-
+	let dl = 0
+	const [rx, ry] = [x % sideLength, y % sideLength]
+	let index: number
 	if (dx === 1) {
+		dl = ry
+		index = 1
 	}
 	if (dx === -1) {
-		const row = rows.get(y)
-		if (row[row.length - 1][1] === "#") return
-		return [row[row.length - 1][0], y]
+		index = 3
+		dl = ry
 	}
 	if (dy === 1) {
-		const column = columns.get(x)
-		if (column[0][1] === "#") return
-		return [x, column[0][0]]
+		index = 2
+		dl = rx
 	}
-	const column = columns.get(x)
-	if (column[column.length - 1][1] === "#") return
-	return [x, column[column.length - 1][0]]
+	if (dy === -1) {
+		index = 0
+		dl = rx
+	}
+	let [nextSide, edge, inverted] = sideMap[side][index]
+	const next = sides[nextSide]
+
+	if (inverted) {
+		dl = sideLength - dl - 1
+	}
+
+	let n: [number, number] | number
+	let newDir = dir
+	if (edge === 0) {
+		n = [next[0] * sideLength + dl, next[1] * sideLength]
+		if (map[n[1]][n[0]] === "#") n = 0
+		else newDir = -Math.PI / 2
+	}
+	if (edge === 2) {
+		n = [next[0] * sideLength + dl, next[1] * sideLength + sideLength - 1]
+		if (map[n[1]][n[0]] === "#") n = 0
+		else newDir = Math.PI / 2
+	}
+	if (edge === 1) {
+		n = [next[0] * sideLength + sideLength - 1, next[1] * sideLength + dl]
+		if (map[n[1]][n[0]] === "#") n = 0
+		else newDir = Math.PI
+	}
+	if (edge === 3) {
+		n = [next[0] * sideLength, next[1] * sideLength + dl]
+		if (map[n[1]][n[0]] === "#") n = 0
+		else newDir = 0
+	}
+	return [newDir, n]
+}
+
+function isSide(x: number, y: number) {
+	return !!map[y][x] && map[y][x] !== " "
+}
+
+type Side = "u" | "d" | "r" | "l" | "b" | "f"
+let sideLength: number
+
+const sides: Partial<Record<Side, [number, number]>> = {}
+
+const getSide = (x: number, y: number) => {
+	return Object.entries(sides)
+		.filter(([k, v]) => v[0] === Math.floor(x / sideLength) && v[1] === Math.floor(y / sideLength))
+		.map(([k, v]) => k)[0] as Side
+}
+
+const sideMap: Record<Side, [[Side, number, boolean], [Side, number, boolean], [Side, number, boolean], [Side, number, boolean]]> = {
+	b: [
+		["u", 3, false],
+		["r", 3, false],
+		["d", 0, false],
+		["l", 3, true],
+	],
+	d: [
+		["b", 2, false],
+		["r", 2, false],
+		["f", 0, false],
+		["l", 0, false],
+	],
+	f: [
+		["d", 2, false],
+		["r", 1, true],
+		["u", 1, false],
+		["l", 1, false],
+	],
+	u: [
+		["l", 2, false],
+		["f", 2, false],
+		["r", 0, false],
+		["b", 0, false],
+	],
+	r: [
+		["u", 2, false],
+		["f", 1, true],
+		["d", 1, false],
+		["b", 1, false],
+	],
+	l: [
+		["d", 3, false],
+		["f", 3, false],
+		["u", 0, false],
+		["b", 3, true],
+	],
+}
+
+function findSides(cur: string, sx: number, sy: number) {
+	if ((sx + 1) * sideLength < map[0].length && isSide((sx + 1) * sideLength, sy * sideLength)) {
+		if (!sides[sideMap[cur][1][0]]) {
+			sides[sideMap[cur][1][0]] = [sx + 1, sy]
+			findSides(sideMap[cur][1][0], sx + 1, sy)
+		}
+	}
+
+	if (sx - 1 >= 0 && isSide((sx - 1) * sideLength, sy * sideLength)) {
+		if (!sides[sideMap[cur][3][0]]) {
+			sides[sideMap[cur][3][0]] = [sx - 1, sy]
+			findSides(sideMap[cur][3][0], sx - 1, sy)
+		}
+	}
+
+	if ((sy + 1) * sideLength < map.length && isSide(sx * sideLength, (sy + 1) * sideLength)) {
+		if (!sides[sideMap[cur][2][0]]) {
+			sides[sideMap[cur][2][0]] = [sx, sy + 1]
+			findSides(sideMap[cur][2][0], sx, sy + 1)
+		}
+	}
+
+	if (sy - 1 >= 0 && isSide(sx * sideLength, (sy - 1) * sideLength)) {
+		if (!sides[sideMap[cur][0][0]]) {
+			sides[sideMap[cur][0][0]] = [sx, sy - 1]
+			findSides(sideMap[cur][0][0], sx, sy - 1)
+		}
+	}
 }
 
 export function two(inputFile: string) {
@@ -136,78 +250,25 @@ export function two(inputFile: string) {
 	rows = new Map<number, [number, string][]>()
 
 	let start: [number, number]
-	map = file.split("\n\n")[0].split("\n")
+	map = file
+		.split("\n\n")[0]
+		.split("\n")
+		.map((l) => l.split(""))
 	const [width, height] = [map[0].length, map.length]
-	const side = width / utils.ratio(width, height)[0]
-
-	const cube: string[][][] = []
-
-	for (let z = 0; z < side; z++) {
-		cube.push(new Array())
-		for (let y = 0; y < side; y++) {
-			cube[z].push(new Array())
-			for (let x = 0; x < side; x++) {
-				cube[z][y].push(" ")
-			}
-		}
-	}
-
-	const isSide = (x: number, y: number) => {
-		return map[Math.floor(y / side)][Math.floor(x / side)] !== " "
-	}
+	sideLength = width / utils.ratio(width, height)[0]
 
 	let sy = 0
 	let sx = 0
 
-	const V = new Set<string>()
-	const Q: [[number, number], [number, number, number]][] = []
-	for (let x = 0; x < width / side; x++) {
-		if (map[0][x * 50 - 1] !== " ") {
+	for (let x = 0; x < width / sideLength; x++) {
+		if (map[0][x * sideLength] !== " ") {
+			start = [x * sideLength, 0]
 			sx = x
 			break
 		}
 	}
-	V.add(`${sx},${sy}`)
-	Q.push([[sx, sy], [0, 0, 1]])
-	// if (isSide((sx + 1) * 50, sy * 50))
-	// 	Q.push([
-	// 		[sx, sy],
-	// 		[4, 0, 0],
-	// 	])
-	// if (isSide(sx * 50, (sy + 1) * 50))
-	// 	Q.push([
-	// 		[sx, sy],
-	// 		[0, 4, 0],
-	// 	])
-
-	while (Q.length > 0) {
-		const [pos, axis] = Q.shift()
-		if(axis[0] > 0) {
-			for(let y = 0; y < side; y++) {
-				for(let z = 0; z < side; z++) {
-					cube[z][y][axis[0]] = map[y + pos[0] * 50][z + pos[1] * 50]
-				}
-			}
-		} else if (axis[1] > 0) {
-			for(let y = 0; y < side; y++) {
-				for(let z = 0; z < side; z++) {
-					cube[z][y][axis[0]] = map[y + pos[0] * 50][z + pos[1] * 50]
-				}
-			}
-		} else if(axis[2] > 0)
-	}
-
-	for (const [y, str] of map.entries()) {
-		const chars = str.split("")
-		for (const [x, ch] of chars.entries()) {
-			if (ch !== " ") {
-				if (!start && ch === ".") start = [x + 1, y + 1]
-
-				columns.set(x + 1, [...(columns.get(x + 1) || []), [y + 1, ch]])
-				rows.set(y + 1, [...(rows.get(y + 1) || []), [x + 1, ch]])
-			}
-		}
-	}
+	sides["b"] = [sx, sy]
+	findSides("b", sx, sy)
 
 	const inst = []
 	let I = file.split("\n\n")[1].trim()
@@ -224,11 +285,15 @@ export function two(inputFile: string) {
 	let pos = start
 	let dir = 0
 
+	const V = new Set<string>()
+
 	for (const move of inst) {
 		if (typeof move === "number") {
 			for (let i = 0; i < move; i++) {
-				const next = findNextTwo(pos, dir)
-				if (!next) break
+				const [newDir, next] = findNextTwo(pos, dir, getSide(pos[0], pos[1]))
+				if (typeof next === "number") break
+				dir = newDir
+				V.add(`${next[0]},${next[1]}`)
 				pos = next
 			}
 		} else {
@@ -247,12 +312,12 @@ export function two(inputFile: string) {
 		dir = 1
 	}
 
-	result = 1000 * pos[1] + 4 * pos[0] + dir
+	result = 1000 * (pos[1] + 1) + 4 * (pos[0] + 1) + dir
 
 	return result
 }
 
 export const expectedResult = {
-	debug: [6032],
+	debug: [6032, 5031],
 	input: [],
 }
