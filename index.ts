@@ -1,3 +1,4 @@
+import clipboard from "clipboardy"
 import { exit } from "process"
 import yargs from "yargs-parser"
 
@@ -50,6 +51,8 @@ async function runPuzzle(puzzle: any, path: string, part: number, input?: string
 	console.log(`#======  RESULT  ======#\n`)
 	console.log(result)
 	console.log("\n#======================#")
+
+	clipboard.writeSync(`${result}`)
 
 	if (puzzle.expectedResult?.input?.[part - 1] && puzzle.expectedResult.input[part - 1] !== result) {
 		console.log(`Run failed. Expected ${puzzle.expectedResult.debug[part - 1]}, got ${result}`)
