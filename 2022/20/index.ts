@@ -42,7 +42,6 @@ export function one(inputFile: string) {
 	let r2 = (zero + 2000) % rows.length
 	let r3 = (zero + 3000) % rows.length
 
-	console.log(rows[r1], rows[r2], rows[r3])
 	result = rows[r1] + rows[r2] + rows[r3]
 
 	return result
@@ -94,7 +93,6 @@ export function two(inputFile: string) {
 	let r2 = (zero + 2000) % rows.length
 	let r3 = (zero + 3000) % rows.length
 
-	console.log(rows[r1], rows[r2], rows[r3])
 	result = rows[r1] + rows[r2] + rows[r3]
 
 	return result

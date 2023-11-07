@@ -28,7 +28,6 @@ export function one(inputFile: string) {
 		if (diff === 0) result += 3 + me[m]
 		else if (diff === -1 || diff === 2) result += 6 + me[m]
 		else result += me[m]
-		console.log(result)
 	})
 
 	return result
