@@ -17,7 +17,6 @@ export function one(inputFile: string) {
 		while (isNaN(parseInt(r[i]))) {
 			i += 1
 			if (i > r.length) {
-				console.log(i)
 				return
 			}
 		}
@@ -58,7 +57,6 @@ export function two(inputFile: string) {
 		while (isNaN(parseInt(r[i])) && !isDigit(r.slice(i))) {
 			i += 1
 			if (i > r.length) {
-				console.log(i)
 				return
 			}
 		}
