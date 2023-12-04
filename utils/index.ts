@@ -34,3 +34,7 @@ export function ratio(a: number, b: number) {
 	}
 	return [a, b]
 }
+
+export function isNum(str: string) {
+	return !isNaN(parseInt(str))
+}
