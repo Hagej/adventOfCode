@@ -5,7 +5,7 @@ export * from "./graph"
 export * from "./memoize"
 export * from "./priority-queue"
 
-export function logImage(output: string[][]) {
+export function logImage(output: string[][] | string[]) {
 	console.log("-".repeat(output[0].length))
 	for (const row of output) {
 		let r = ""
