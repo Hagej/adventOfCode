@@ -58,7 +58,35 @@ function check(flows: Record<string, string[][]>, r: Record<"x" | "m" | "a" | "s
 }
 
 export function two(inputFile: string) {
-	throw new Error("Not implemented")
+	let result = 0
+	const file = fs.readFileSync(inputFile, "utf-8")
+	const [flows, ratings] = file
+		.trim()
+		.split("\n\n")
+		.map((r) => {
+			const row = r
+			return row
+		})
+
+	const F = flows.split("\n").reduce((prev, cur) => {
+		const [id, rest] = cur.split("{")
+		const conditions = rest
+			.replace(/}/g, "")
+			.split(",")
+			.map((c) => c.split(":"))
+		return { ...prev, [id]: conditions }
+	}, {})
+
+	const R: Record<"x" | "m" | "a" | "s", number>[] = ratings.split("\n").map((r) => {
+		r = r.replace(/{|}/g, "")
+		const props = r.split(",").map((p) => p.split("="))
+
+		return props.reduce((prev, cur) => {
+			return { ...prev, [cur[0]]: parseInt(cur[1]) }
+		}, {} as Record<"x" | "m" | "a" | "s", number>)
+	})
+
+	return result
 }
 
 export const expectedResult = {

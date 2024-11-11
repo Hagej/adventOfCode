@@ -99,24 +99,28 @@ export function two(inputFile: string) {
 		result += length
 	})
 
-	// const S = [[1, 1]]
+	const S = [[1, 1]]
 
-	// while (S.length) {
-	// 	const [y, x] = S.pop()
-	// 	let key = `${y}|${x}`
-	// 	dug.add(key)
-	// 	for (const dir of Object.values(dirs)) {
-	// 		const xx = x + dir[1]
-	// 		const yy = y + dir[0]
-	// 		key = `${yy}|${xx}`
-	// 		if (!dug.has(key)) {
-	// 			dug.add(key)
-	// 			S.push([yy, xx])
-	// 		}
-	// 	}
-	// }
+	while (S.length) {
+		const [y, x] = S.pop()
+		loop: for (const dir of Object.values(dirs)) {
+			const xx = x + dir[1]
+			const yy = y + dir[0]
+			for(const wall of dug) {
+				const [[y0, x0], [y1, x1]] = wall
+
+				if( yy >= Math.min(y0, y1) && yy <= Math.max(y0, y1) && xx >= Math.min(x0, x1) && xx <= Math.max(x0, x1)) {
+					continue loop
+				} else {
+					result += 1
+					S.push([yy, xx])
+				}
+			}
+		}
+	}
 
 	return result
+}
 
 export const expectedResult = {
 	debug: [62],
