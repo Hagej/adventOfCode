@@ -123,8 +123,6 @@ export function two(inputFile: string) {
 
 	}
 
-	if (inputFile.endsWith("debug")) console.log(blocks)
-
 	result = calculateChecksum(blocks)
 
 	return result
