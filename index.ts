@@ -1,5 +1,5 @@
 import clipboard from "clipboardy"
-import { watch } from "fs"
+import { fstat, watch } from "fs"
 import { exit } from "process"
 import yargs from "yargs-parser"
 
@@ -41,8 +41,17 @@ async function runPuzzle(puzzle: any, path: string, part: number, input?: string
 	}
 	console.log("Running with debug data\n")
 	let before = performance.now()
+	let debugResult
 	try {
-		var debugResult = part === 2 ? await puzzle.two(`${path}/debug`) : await puzzle.one(`${path}/debug`)
+		if (part === 2) {
+			if (await Bun.file(`${path}/debug2`).exists()) {
+				debugResult = await puzzle.two(`${path}/debug2`)
+			} else {
+				debugResult = await puzzle.two(`${path}/debug`)
+			}
+		} else {
+			debugResult = await puzzle.one(`${path}/debug`)
+		}
 	} catch (e) {
 		console.error(e)
 		exit()
