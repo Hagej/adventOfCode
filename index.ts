@@ -14,9 +14,10 @@ async function main() {
 	const part = args._[0] ? (args._[0] as number) : 1
 	const file = args.f ?? "index.ts"
 	const input = args.i
+	const debug = !!args.b
 	let puzzle = await import(`./${path}/${file}`)
-	console.log(`Running puzzle ${year} day ${day} part ${part}!`)
-	runPuzzle(puzzle, path, part, input)
+	console.log(`Running puzzle ${year} day ${day}${!!puzzle.both ? "" : ` part ${part}!`}`)
+	runPuzzle(puzzle, path, part, debug, input)
 	if (!!args.w) {
 		console.log(">>>> Entering Watch Mode <<<<")
 		let version = 0
@@ -24,7 +25,7 @@ async function main() {
 			version += 1
 			puzzle = await import(`./${path}/${file}?version=${version}`)
 			console.log(puzzle)
-			runPuzzle(puzzle, path, part, input)
+			runPuzzle(puzzle, path, part, debug, input)
 		})
 	}
 }
@@ -32,58 +33,61 @@ async function main() {
 const duration = new Intl.DurationFormat("en-US", {
 	style: "short",
 })
-async function runPuzzle(puzzle: any, path: string, part: number, input?: string) {
+async function runPuzzle(puzzle: any, path: string, part: number, debug = true, input?: string) {
 	if (input) {
 		console.log(`Running with ${input} data`)
 		const result = part === 2 ? await puzzle.two(`${path}/${input}`) : await puzzle.one(`${path}/${input}`)
 		console.log(result)
 		return
 	}
-	console.log("Running with debug data\n")
-	let before = performance.now()
-	let debugResult
-	try {
-		if (!!puzzle.both) {
-			debugResult = await puzzle.both(`${path}/debug`)
-		}
-		else if (part === 2) {
-			if (await Bun.file(`${path}/debug2`).exists()) {
-				debugResult = await puzzle.two(`${path}/debug2`)
-			} else {
-				debugResult = await puzzle.two(`${path}/debug`)
+	if (!debug) {
+
+		console.log("Running with debug data\n")
+		let before = performance.now()
+		let debugResult
+		try {
+			if (!!puzzle.both) {
+				debugResult = await puzzle.both(`${path}/debug`)
 			}
-		} else {
-			debugResult = await puzzle.one(`${path}/debug`)
+			else if (part === 2) {
+				if (await Bun.file(`${path}/debug2`).exists()) {
+					debugResult = await puzzle.two(`${path}/debug2`)
+				} else {
+					debugResult = await puzzle.two(`${path}/debug`)
+				}
+			} else {
+				debugResult = await puzzle.one(`${path}/debug`)
+			}
+		} catch (e) {
+			console.error(e)
+			exit()
 		}
-	} catch (e) {
-		console.error(e)
-		exit()
-	}
-	let time = performance.now() - before
-	let t = duration.format(getTimeObject(time))
+		let time = performance.now() - before
+		let t = duration.format(getTimeObject(time))
 
-	console.log(`#=========  DEBUG  =========#\n`)
-	console.log(Array.isArray(debugResult) ? debugResult.map((r, i) => `Part ${i + 1}: ${r}`).join("\n") : debugResult)
-	console.log(`\n#======  ${t}  ======#\n`)
+		console.log(`#=========  DEBUG  =========#\n`)
+		console.log(Array.isArray(debugResult) ? debugResult.map((r, i) => `Part ${i + 1}: ${r}`).join("\n") : debugResult)
+		console.log(`\n#======  ${t}  ======#\n`)
 
-	if (!!puzzle.both) {
-		let failed = false
-		if (puzzle.expectedResult?.debug?.[0] && puzzle.expectedResult.debug[0] !== debugResult[0]) {
-			console.log(`Debug failed. Expected ${puzzle.expectedResult.debug[0]}, got ${debugResult[0]}`)
-			failed = true
+		if (!!puzzle.both) {
+			let failed = false
+			if (puzzle.expectedResult?.debug?.[0] && puzzle.expectedResult.debug[0] !== debugResult[0]) {
+				console.log(`Debug failed. Expected ${puzzle.expectedResult.debug[0]}, got ${debugResult[0]}`)
+				failed = true
+			}
+			if (puzzle.expectedResult?.debug?.[1] && puzzle.expectedResult.debug[1] !== debugResult[1]) {
+				console.log(`Debug failed. Expected ${puzzle.expectedResult.debug[1]}, got ${debugResult[1]}`)
+				failed = true
+			}
+			if (failed) return
+		} else if (puzzle.expectedResult?.debug?.[part - 1] && puzzle.expectedResult.debug[part - 1] !== debugResult) {
+			console.log(`Debug failed. Expected ${puzzle.expectedResult.debug[part - 1]}, got ${debugResult}`)
+			return
 		}
-		if (puzzle.expectedResult?.debug?.[1] && puzzle.expectedResult.debug[1] !== debugResult[1]) {
-			console.log(`Debug failed. Expected ${puzzle.expectedResult.debug[1]}, got ${debugResult[1]}`)
-			failed = true
-		}
-		if (failed) return
-	} else if (puzzle.expectedResult?.debug?.[part - 1] && puzzle.expectedResult.debug[part - 1] !== debugResult) {
-		console.log(`Debug failed. Expected ${puzzle.expectedResult.debug[part - 1]}, got ${debugResult}`)
-		return
 	}
 
 	console.log("Running with input data\n")
-	before = performance.now()
+	let before = performance.now()
 	try {
 		if (!!puzzle.both) {
 			var result = await puzzle.both(`${path}/input`)
@@ -94,8 +98,8 @@ async function runPuzzle(puzzle: any, path: string, part: number, input?: string
 		console.error(e)
 		exit()
 	}
-	time = performance.now() - before
-	t = duration.format(getTimeObject(time))
+	let time = performance.now() - before
+	let t = duration.format(getTimeObject(time))
 	console.log(`#=========  RESULT  =========#\n`)
 	console.log(Array.isArray(result) ? result.map((r, i) => `Part ${i + 1}: ${r}`).join("\n") : result)
 	console.log(`\n#======  ${t}  ======#`)
