@@ -27,7 +27,7 @@ export function one(inputFile: string) {
 	return result
 }
 
-function findPath([width, height]: [number, number], corruptedBytes: Set<string>) {
+function findPath([width, height]: [number, number], corruptedBytes: string[]) {
 	let result = Number.MAX_SAFE_INTEGER
 	const Q = new utils.PriorityQueue<[number, number]>()
 	Q.enqueue([0, 0], 0)
@@ -35,12 +35,11 @@ function findPath([width, height]: [number, number], corruptedBytes: Set<string>
 	while(!Q.isEmpty()) {
 		const {priority, element: [x, y]} = Q.dequeue()
 		if(x === width && y === height) {
-			return priority
-			// if(priority < result) {
-			// 	result = priority
-			// } else {
-			// 	break
-			// }
+			if(priority < result) {
+				result = priority
+			} else {
+				break
+			}
 		}
 		if(V[`${x},${y}`] <= priority) {
 			continue
@@ -50,7 +49,7 @@ function findPath([width, height]: [number, number], corruptedBytes: Set<string>
 		
 		for(const [dx, dy] of cardinals) {
 			const [nx, ny] = [x + dx, y + dy]
-			if(corruptedBytes.has(`${nx},${ny}`)) continue
+			if(corruptedBytes.includes(`${nx},${ny}`)) continue
 			if(nx < 0 || nx > width || ny < 0 || ny > height) continue
 
 			Q.enqueue([nx, ny], priority + 1)
@@ -78,20 +77,24 @@ export function two(inputFile: string) {
 
 		let corrupted = inputFile.endsWith("debug") ? 12 : 1024
 
+		let min = corrupted
+		let max = rows.length
+
 	const corruptedBytes = new Set<string>()
 	for(let i = 0; i < corrupted; i++) {
 		corruptedBytes.add(rows[i])
 	}
 
-	let path = findPath([width, height], corruptedBytes)
-
-	while(path) {
-		corrupted++
-		corruptedBytes.add(rows[corrupted])
-		path = findPath([width, height], corruptedBytes)
+	while(max - min > 1) {
+		const mid = Math.floor((min + max) / 2)
+		const path = findPath([width, height], rows.slice(0, mid))
+		if(path) {
+			min = mid
+		} else {
+			max = mid
+		}
 	}
-
-	result = rows[corrupted]
+	result = rows[min]
 
 	return result
 }
