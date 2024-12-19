@@ -80,8 +80,6 @@ export function two(inputFile: string) {
 	const map = rows[0].map((r) => r.replaceAll("#", "##").replaceAll("O", "[]").replaceAll(".", "..").replace("@", "@.").split(""))
 	const moves = rows[1].flatMap((r) => r.split(""))
 
-	utils.logImage(map)
-
 	let [xPos, yPos] = [0, 0]
 
 	for (let y = 0; y < map.length; y++) {
@@ -107,22 +105,22 @@ export function two(inputFile: string) {
 			continue
 		}
 
-		// Box found
-		let [bx, by] = [nx + dx, ny + dy]
-		while (map[by][bx] === "O") {
-			[bx, by] = [bx + dx, by + dy]
-		}
-		if (map[by][bx] === "#") continue
 
-		xPos = nx
-		yPos = ny
-		map[ny][nx] = "."
-		map[by][bx] = "O"
+		const boxesMoved = moveBoxes(map, [nx, ny], move)
+		if (boxesMoved) {
+			xPos = nx
+			yPos = ny
+			const bm = [...new Set([...boxesMoved.map((v) => `${v[0]},${v[1]}`)])].map((s) => [parseInt(s.split(",")[0]), parseInt(s.split(",")[1])])
+			for (const [bx, by] of bm as [number, number][]) {
+				map[by + dy][bx + dx] = map[by][bx]
+				map[by][bx] = "."
+			}
+		}
 	}
 
 	for (let y = 0; y < map.length; y++) {
 		for (let x = 0; x < map[0].length; x++) {
-			if (map[y][x] === "O") {
+			if (map[y][x] === "[") {
 				result += y * 100 + x
 			}
 		}
@@ -131,7 +129,41 @@ export function two(inputFile: string) {
 	return result
 }
 
+function moveBoxes(map: string[][], pos: [number, number], dir: string): [number, number][] | false {
+	const cur = map[pos[1]][pos[0]]
+	if (cur === ".") return []
+	if (cur === "#") return false
+
+	const [dx, dy] = mv[dir]
+
+	const fw = map[pos[1] + dy][pos[0] + dx]
+	if (fw === "#") return false
+	const fwRes = moveBoxes(map, [pos[0] + dx, pos[1] + dy], dir)
+	if (!fwRes) return false
+	if (dir === "^" || dir === "v") {
+		if (cur === "]") {
+			const leftRes = moveBoxes(map, [pos[0] - 1, pos[1] + dy], dir)
+			if (leftRes) {
+				return [...leftRes, ...fwRes, [pos[0], pos[1]], [pos[0] - 1, pos[1]]]
+			}
+			return false
+		}
+
+		if (cur === "[") {
+			const rightRes = moveBoxes(map, [pos[0] + 1, pos[1] + dy], dir)
+			if (rightRes) {
+				return [...rightRes, ...fwRes, [pos[0], pos[1]], [pos[0] + 1, pos[1]]]
+			}
+			return false
+		}
+	} else {
+		if (fw === ".") return [[pos[0], pos[1]]]
+
+		return [...fwRes, [pos[0], pos[1]]]
+	}
+}
+
 export const expectedResult = {
-	debug: [10092, 123],
+	debug: [10092, 9021],
 	input: [],
 }
