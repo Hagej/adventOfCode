@@ -36,30 +36,56 @@ export function two(inputFile: string) {
 			return row
 		})
 
-	const lastFour = []
-	const sequence = "-2,1,-1,3"
+	const sequences: Array<{ seq: string, value: number }[]> = []
 	rows.map((r, index) => {
+		const lastFour = []
 		let secret = parseInt(r)
 		let prev = secret % 10
+		let sequence = []
 		for (let i = 0; i < 2000; i++) {
 			secret = ((secret << 6) ^ secret) & 16777215
 			secret = ((secret >> 5) ^ secret) & 16777215
 			secret = ((secret << 11) ^ secret) & 16777215
-			const next = (secret % 10)
-			const diff = prev - next
+			const next = secret % 10
+			const diff = next - prev
 			prev = next
+
 			lastFour.push(diff)
-			if (lastFour.length > 4) {
+			if (lastFour.length > 3) {
+				sequence.push({ seq: lastFour.join(","), value: next })
+
 				lastFour.shift()
-				if (lastFour.join(",") === sequence) {
-					console.log(lastFour, r, i)
-					result += next
-				}
+
 			}
 		}
-
-
+		sequences.push(sequence)
 	})
+
+	const seq = sequences.flat()
+	const S: Record<string, number> = {}
+	for (const sequence of seq) {
+		if (S[sequence.seq]) {
+			S[sequence.seq] += 1
+		} else {
+			S[sequence.seq] = 1
+		}
+	}
+
+	const ordered = Object.entries(S).map((s) => s).sort((a, b) => b[1] - a[1])
+
+	for (const o of ordered) {
+		if (o[1] * 7 < result) break
+		let sum = 0
+		for (let j = 0; j < sequences.length; j++) {
+			const hit = sequences[j].find((s) => s.seq === o[0])
+			if (hit) {
+				sum += hit.value
+			}
+		}
+		if (sum > result) {
+			result = sum
+		}
+	}
 
 	return result
 }
