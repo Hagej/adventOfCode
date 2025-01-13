@@ -1,4 +1,5 @@
 import * as utils from "@utils"
+import { privateEncrypt } from "crypto"
 import fs from "fs"
 import { isArrowFunction } from "typescript"
 
@@ -60,25 +61,20 @@ export function one(inputFile: string) {
 			i3 = `${i3}${getInstructions(directionalKeypad, char, x, y)}`
 				;[x, y] = directionalKeypad[char]
 		}
-		console.log(row)
-		console.log(i1)
-		console.log(i2)
-		console.log(i3, i3.length)
 
 		result += parseInt(row) * i3.length
+		console.log(i1, i1.length)
+		console.log(i2, i2.length)
+		console.log(i3, i3.length)
+		console.log(result)
+		console.log("=============")
 	}
 
 
 	return result
 }
 
-let cache = {}
-function getInstructions(keypad: Record<string, [number, number]>, value: string, x: number, y: number) {
-	const k = keypad["E"][1] === 3 ? "N" : "D"
-	const key = `${k},${value},${x},${y}`
-	if (cache[key]) {
-		return cache[key]
-	}
+function getInstructions(keypad: Record<string, [number, number]>, value: string, x: number, y: number): string {
 	const target = keypad[value]
 
 
@@ -103,14 +99,45 @@ function getInstructions(keypad: Record<string, [number, number]>, value: string
 		}
 	}
 
-	cache[key] = `${result}A`
 
 	return `${result}A`
 
 }
 
-let outerCache = {}
+function isValid(keypad: Record<string, [number, number]>, inst: string[], x: number, y: number) {
+	let ix = x, iy = y
 
+
+	for (const c of inst) {
+		if (c === "<") ix -= 1
+		if (c === ">") ix += 1
+		if (c === "^") iy -= 1
+		if (c === "v") iy += 1
+
+		if (keypad["E"][0] === ix && keypad["E"][1] === iy) {
+			return false
+		}
+
+	}
+
+	return true
+
+}
+
+let combinationMap = {
+	A: ["A"],
+}
+
+function getInstructionSet(keypad: Record<string, [number, number]>, inst: string): string {
+	// if (combinationMap[inst]) return combinationMap[inst].join("")
+	let instructions = ""
+	let [x, y] = keypad["A"]
+	for (const char of inst) {
+		instructions = `${instructions}${getInstructions(keypad, char, x, y)}`
+			;[x, y] = keypad[char]
+	}
+	return instructions
+}
 export function two(inputFile: string) {
 	let result = 0
 	const file = fs.readFileSync(inputFile, "utf-8")
@@ -123,70 +150,151 @@ export function two(inputFile: string) {
 		})
 
 
-	cache = {}
-	outerCache = {}
+	for (const start of Object.entries(directionalKeypad)) {
+		for (const target of Object.entries(directionalKeypad)) {
+			if (target[0] === start[0] || start[0] === "E" || target[0] === "E") continue
 
-	// Räkna ut kombinationer som finns
-	// Räkna antalet kombinationer för varje iteration 25ggr
-	// Räkna ut totala längden
-	const combinations: Record<string, number> = {}
-
-	for (const row of rows) {
-		let i1 = ""
-		let [x, y] = numericKeypad["A"]
-		// From first robot to second
-		for (const char of row) {
-			i1 = `${i1}${getInstructions(numericKeypad, char, x, y)}`
-				;[x, y] = numericKeypad[char]
-		}
-
-		for (let j = 0; j < 25; j++) {
-			console.log(j, Object.entries(outerCache).length)
-			console.log(i1.length)
-			console.log(outerCache)
-
-			let i2 = ""
-				;[x, y] = directionalKeypad["A"]
-			let prevI1A = 0
-			let prevI2A = 0
-			outer: for (let i = 0; i < i1.length; i++) {
-
-				const nextA = i1.slice(prevI1A).indexOf("A")
-				const aSlice = i1.slice(prevI1A, prevI1A + nextA + 1)
-
-				//console.log(aSlice)
-
-				if (outerCache[aSlice]) {
-					//console.log("Cache hit", aSlice, outerCache[aSlice])
-					i2 = `${i2}${outerCache[aSlice]}`
-					i = i + aSlice.length - 1
-					prevI1A = i + 1
-					prevI2A = i2.length
-
-				} else {
-					i2 = `${i2}${getInstructions(directionalKeypad, i1[i], x, y)}`
-						;[x, y] = directionalKeypad[i1[i]]
-					if (i1[i] === "A") {
-						outerCache[i1.slice(prevI1A, i + 1)] = i2.slice(prevI2A)
-						// console.log("Slice 1", i1.slice(prevI1A, i + 1))
-						// console.log("Slice 2", i2.slice(prevI2A))
-						prevI1A = i + 1
-						prevI2A = i2.length
-						//console.log(outerCache)
+			let i = getInstructions(directionalKeypad, target[0], directionalKeypad[start[0]][0], directionalKeypad[start[0]][1]).slice(0, -1)
+			const perms = utils.permutations(i.split(""))
+			let shortest = "=".repeat(100)
+			let key = ""
+			for (const p of perms) {
+				if (!isValid(directionalKeypad, p, directionalKeypad[start[0]][0], directionalKeypad[start[0]][1])) {
+					// console.log("Not valid", p)
+					continue
+				}
+				let instructions = getInstructionSet(directionalKeypad, `${p.join("")}A`)
+				if (instructions.length < shortest.length) {
+					shortest = instructions
+					key = `${p.join("")}A`
+				} else if (instructions.length === shortest.length && instructions !== shortest) {
+					let i2 = instructions, i3 = shortest
+					while (i2.length === i3.length) {
+						i2 = getInstructionSet(directionalKeypad, i2)
+						i3 = getInstructionSet(directionalKeypad, i3)
+					}
+					if (i2.length < i3.length) {
+						shortest = instructions
+						key = `${p.join("")}A`
 					}
 				}
 			}
-			// outerCache[i1] = i2
-			i1 = i2
+
+			combinationMap[key] = shortest.split("A").slice(0, -1).map((s) => `${s}A`)
 
 		}
+	}
 
-		// console.log(row)
-		// console.log(i1)
-		// console.log(i2)
-		// console.log(i3, i3.length)
+	console.log(combinationMap)
 
-		result += parseInt(row) * i1.length
+
+
+	for (const row of rows) {
+		let i1 = getInstructionSet(numericKeypad, row)
+		const instructions = i1.split("A").map((s) => `${s}A`).slice(0, -1)
+
+		let combs: Record<string, number> = {}
+
+		for (const inst of instructions) {
+			const perms = utils.permutations(inst.split(""))
+			let shortest = inst
+			for (const p of perms) {
+
+				if (!isValid(numericKeypad, p, numericKeypad["A"][0], numericKeypad["A"][1])) {
+					continue
+				}
+				let instructions = getInstructionSet(directionalKeypad, `${p.join("")}A`)
+				if (instructions.length < shortest.length) {
+					shortest = instructions
+				} else if (instructions.length === shortest.length && instructions !== shortest) {
+					let i2 = instructions, i3 = shortest
+					while (i2.length === i3.length) {
+						i2 = getInstructionSet(directionalKeypad, i2)
+						i3 = getInstructionSet(directionalKeypad, i3)
+					}
+					if (i2.length < i3.length) {
+						shortest = instructions
+					}
+				}
+				if (p.join("") === "^<<^^A" || p.join("") === "^^<<^A") console.log("Hellooo there", shortest)
+			}
+			if (combs[shortest]) {
+				combs[shortest] += 1
+			} else {
+				combs[shortest] = 1
+			}
+		}
+
+		const next = Object.keys(combs).reduce((prev, cur) => ({ ...prev, [cur]: 0 }), {})
+
+		console.log("After numeric keypad", combs)
+
+
+		for (let [ins, amount] of Object.entries(combs)) {
+			let i1 = getInstructionSet(directionalKeypad, ins)
+			const instructions = i1.split("A").map((s) => `${s}A`).slice(0, -1)
+			for (const inst of instructions) {
+
+				const perms = utils.permutations(inst.split(""))
+				let shortest = inst
+				for (const p of perms) {
+					if (!isValid(directionalKeypad, p, directionalKeypad["A"][0], directionalKeypad["A"][1])) {
+						continue
+					}
+					let instructions = getInstructionSet(directionalKeypad, `${p.join("")}A`)
+					if (instructions.length < shortest.length) {
+						shortest = instructions
+					} else if (instructions.length === shortest.length && instructions !== shortest) {
+						let i2 = instructions, i3 = shortest
+						while (i2.length === i3.length) {
+							i2 = getInstructionSet(directionalKeypad, i2)
+							i3 = getInstructionSet(directionalKeypad, i3)
+						}
+						if (i2.length < i3.length) {
+							shortest = instructions
+						}
+					}
+				}
+				if (next[shortest]) {
+					next[shortest] += 1
+				} else {
+					next[shortest] = 1
+				}
+			}
+		}
+
+		combs = Object.entries(next).filter((c) => c[1] !== 0).reduce((prev, cur) => ({ ...prev, [cur[0]]: cur[1] }), {})
+
+		console.log("After first keypad", combs)
+
+
+		for (let j = 0; j < 24; j++) {
+
+			const next = Object.keys(combs).reduce((prev, cur) => ({ ...prev, [cur]: 0 }), {})
+
+			for (let [inst, amount] of Object.entries(combs)) {
+				if (!combinationMap[inst]) {
+					console.error("Missing instruction:", inst)
+				}
+				for (const v of combinationMap[inst]) {
+					if (next[v]) {
+						next[v] += amount
+					} else {
+						next[v] = amount
+					}
+				}
+			}
+
+			combs = next
+		}
+
+
+
+		const length = Object.entries(combs).reduce((prev, val) => prev + (val[0].length * val[1]), 0)
+
+		console.log(row, length)
+
+		result += parseInt(row) * length
 	}
 
 
@@ -195,5 +303,5 @@ export function two(inputFile: string) {
 
 export const expectedResult = {
 	debug: [126384],
-	input: [],
+	input: [184716, 123],
 }
