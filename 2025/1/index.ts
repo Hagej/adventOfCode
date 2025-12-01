@@ -55,16 +55,18 @@ export function two(inputFile: string) {
         result += 1
       }
     } else {
+      if (dial === 0) {
+        result -= 1
+      }
       dial -= amount
       while (dial < 0) {
-        dial = 100 + dial
         result += 1
+        dial = 100 + dial
       }
       if (dial === 0) {
         result += 1
       }
     }
-    console.log(r, dial, result)
   })
 
   return result
