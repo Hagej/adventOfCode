@@ -54,3 +54,15 @@ export function permutations(numbers: number[]): Array<number[]> {
 export function union(a: Array<string | number | boolean>, b: Array<string | number | boolean>) {
 	return [...new Set([...a, ...b])]
 }
+
+export function partition<T>(array: T[], filter: (t: T) => boolean) {
+	const [hit, miss]: [T[], T[]] = [[], []]
+	for (const item of array) {
+		if (filter(item)) {
+			hit.push(item)
+		} else {
+			miss.push(item)
+		}
+	}
+	return [hit, miss]
+}
