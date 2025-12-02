@@ -20,10 +20,7 @@ export function one(inputFile: string) {
     if (dir === "R") {
       dial = (dial + amount) % 100
     } else {
-      dial -= amount
-      while (dial < 0) {
-        dial = 100 + dial
-      }
+      dial = utils.mod(dial - amount, 100)
     }
     if (dial === 0) {
       result += 1
@@ -74,5 +71,5 @@ export function two(inputFile: string) {
 
 export const expectedResult = {
   debug: [3, 6],
-  input: [],
+  input: [1195, 6770],
 }
