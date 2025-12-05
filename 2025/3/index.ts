@@ -23,7 +23,6 @@ export function one(inputFile: string) {
         second = num
       }
     }
-    console.log(r, first, second)
     result += parseInt(`${first}${second}`)
   })
 
@@ -54,7 +53,6 @@ export function two(inputFile: string) {
         }
       }
     }
-    console.log(r, digits)
     result += parseInt(`${digits.map((d) => `${d}`).join("")}`)
   })
 
